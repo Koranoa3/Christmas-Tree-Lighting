@@ -56,13 +56,28 @@ void loop()
 {
   tick = millis();
 
-  // ボタンが押されたらパターンを切り替え
+  // ボタンが押されたらパターンを切り替え、長押しで速度変更
   static bool lastBtnState = HIGH;
+  static unsigned long btnPressTime = 0;
   bool btnState = digitalRead(BTN_PIN);
+  
   if (lastBtnState == HIGH && btnState == LOW)
   {
-    cyclePattern();
-    // cycleSpeed();
+    // ボタンが押された瞬間
+    btnPressTime = millis();
+  }
+  else if (lastBtnState == LOW && btnState == HIGH)
+  {
+    // ボタンが離された瞬間
+    unsigned long pressDuration = millis() - btnPressTime;
+    if (pressDuration >= 500)
+    {
+      cycleSpeed();
+    }
+    else
+    {
+      cyclePattern();
+    }
   }
   lastBtnState = btnState;
 
