@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include <FastLED.h>
+#include "config.h"
 #include "patterns.h"
 
 #define BTN_PIN 18
 #define LED_PIN 19
-#define NUM_LEDS 50   // LEDの数 (max 300)
-#define BRIGHTNESS 63 // 全体の明るさ (0-255)
 
 CRGB leds[NUM_LEDS];
 uint32_t tick = 0;
@@ -27,15 +26,13 @@ void cyclePattern()
 }
 
 // Animation speed
-uint16_t ANIM_SPEED = 1000; // アニメーション速度（ミリ秒）
 uint16_t animSpeedLevels[] = {500, 1000, 2000};
 int currentSpeedIndex;
 
 void cycleSpeed()
 {
   currentSpeedIndex = (currentSpeedIndex + 1) % (sizeof(animSpeedLevels) / sizeof(animSpeedLevels[0]));
-  ANIM_SPEED = animSpeedLevels[currentSpeedIndex];
-  Serial.printf("Animation speed changed to: %d ms\n", ANIM_SPEED);
+  Serial.printf("Animation speed changed to: %d ms\n", animSpeedLevels[currentSpeedIndex]);
 }
 
 // Setup function
@@ -45,9 +42,9 @@ void setup()
   Serial.begin(115200);
 
   pinMode(BTN_PIN, INPUT_PULLUP);
-  currentPatternIndex = 0;
+  currentPatternIndex = DEFAULT_PATTERN_INDEX;
   currentPattern = patterns[currentPatternIndex];
-  currentSpeedIndex = 1; // Default to medium speed
+  currentSpeedIndex = DEFAULT_ANIM_SPEED_INDEX; // Default to medium speed
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS);
