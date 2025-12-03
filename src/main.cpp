@@ -83,7 +83,12 @@ void loop()
   lastBtnState = btnState;
 
   // 現在のパターンを実行
-  currentPattern(tick, leds, NUM_LEDS, animSpeedLevels[currentSpeedIndex]);
+  currentPattern(tick, leds, (NUM_LEDS + 1) / 2, animSpeedLevels[currentSpeedIndex]);
+
+  // パターンの複製・反転追加
+  for (uint16_t i = 0; i < NUM_LEDS / 2; i++) {
+    leds[NUM_LEDS - 1 - i] = leds[i];
+  }
 
   FastLED.show();
   delay(16); // 約60fps
