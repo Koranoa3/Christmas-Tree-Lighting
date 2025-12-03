@@ -14,6 +14,7 @@ PatternFunc patterns[] = {
     patternRainbow,
     patternTwinkle,
     patternWipe,
+    patternFire,
 };
 int currentPatternIndex;
 PatternFunc currentPattern;
