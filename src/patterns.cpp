@@ -41,8 +41,9 @@ void patternTwinkle(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSp
     if (random8() < 255) {
         leds[random16(numLeds)] = CRGB::White;
     }
-    if (impact > 0.9f)
-        fill_solid(leds, numLeds, CRGB::White);
+    if (impact == 1.0f)
+        for (uint16_t i = 0; i < numLeds / 3; i++)
+            leds[random16(numLeds)] = CRGB::White;
 }
 
 void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {

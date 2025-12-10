@@ -143,7 +143,7 @@ void loop()
   if (impact < 0.01f)
     impact = 0.0f;
   if (detectButtonJustPressed(1))
-    impact += 0.8f;
+    impact = 1.0f;
 
   // 現在のパターンを実行
 
