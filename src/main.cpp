@@ -19,6 +19,20 @@ PatternFunc patterns[] = {
 int currentPatternIndex;
 PatternFunc currentPattern;
 
+static bool butterflyMode = false;
+void toggleButterflyMode()
+{
+  butterflyMode = !butterflyMode;
+  if (butterflyMode)
+  {
+    Serial.println("Butterfly mode enabled");
+  }
+  else
+  {
+    Serial.println("Butterfly mode disabled");
+  }
+}
+
 void cyclePattern()
 {
   currentPatternIndex = (currentPatternIndex + 1) % (sizeof(patterns) / sizeof(patterns[0]));
@@ -43,6 +57,7 @@ void setup()
   Serial.begin(115200);
 
   pinMode(BTN_PIN, INPUT_PULLUP);
+  butterflyMode = false;
   currentPatternIndex = DEFAULT_PATTERN_INDEX;
   currentPattern = patterns[currentPatternIndex];
   currentSpeedIndex = DEFAULT_ANIM_SPEED_INDEX; // Default to medium speed
@@ -61,7 +76,7 @@ void loop()
   static bool lastBtnState = HIGH;
   static unsigned long btnPressTime = 0;
   bool btnState = digitalRead(BTN_PIN);
-  
+
   if (lastBtnState == HIGH && btnState == LOW)
   {
     // ボタンが押された瞬間
@@ -71,7 +86,11 @@ void loop()
   {
     // ボタンが離された瞬間
     unsigned long pressDuration = millis() - btnPressTime;
-    if (pressDuration >= 500)
+    if (pressDuration >= 1500)
+    {
+      toggleButterflyMode();
+    }
+    else if (pressDuration >= 500)
     {
       cycleSpeed();
     }
@@ -83,12 +102,19 @@ void loop()
   lastBtnState = btnState;
 
   // 現在のパターンを実行
-  currentPattern(tick, leds, (NUM_LEDS + 1) / 2, animSpeedLevels[currentSpeedIndex]);
 
-  // パターンの複製・反転追加
-  for (uint16_t i = 0; i < NUM_LEDS / 2; i++) {
-    leds[NUM_LEDS - 1 - i] = leds[i];
+  if (butterflyMode)
+  {
+    currentPattern(tick, leds, (NUM_LEDS + 1) / 2, animSpeedLevels[currentSpeedIndex]);
+
+    // パターンの複製・反転追加
+    for (uint16_t i = 0; i < NUM_LEDS / 2; i++)
+    {
+      leds[NUM_LEDS - 1 - i] = leds[i];
+    }
   }
+  else
+    currentPattern(tick, leds, NUM_LEDS, animSpeedLevels[currentSpeedIndex]);
 
   FastLED.show();
   delay(16); // 約60fps
