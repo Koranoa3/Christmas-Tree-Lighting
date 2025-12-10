@@ -11,6 +11,7 @@ typedef void (*PatternFunc)(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_
 
 // パターン関数の宣言
 void patternSolidWhite(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed);
+void patternEndDebug(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed);
 void patternRainbow(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed);
 void patternChase(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed);
 void patternBreathing(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed);

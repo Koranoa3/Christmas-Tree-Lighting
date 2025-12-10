@@ -12,6 +12,7 @@ uint32_t tick = 0;
 
 // Patterns
 PatternFunc patterns[] = {
+    patternEndDebug,
     patternRainbow,
     patternTwinkle,
     patternWipe,
@@ -113,6 +114,19 @@ void loop()
       cycleSpeed();
     else
       cyclePattern();
+  }
+
+  // ボタン2 押下時間を検出し、対応する機能を発動
+  static int centerPercent = 50;
+  pressDuration = detectButtonPressDuration(1);
+  if (pressDuration > 0)
+  {
+    if (pressDuration >= 500)
+      centerPercent -= 10;
+    else
+      centerPercent += 1;
+    
+    Serial.printf("Center percent adjusted to: %d%%\n", centerPercent);
   }
 
   // 現在のパターンを実行

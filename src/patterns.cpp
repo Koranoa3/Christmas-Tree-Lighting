@@ -6,6 +6,13 @@ void patternSolidWhite(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t ani
     fill_solid(leds, numLeds, CRGB::White);
 }
 
+// デバッグ用：最後のLEDを白、最後から2番目を灰色に点灯
+void patternEndDebug(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+    fill_solid(leds, numLeds, CRGB::Black);
+    leds[numLeds-1] = CRGB::White;
+    leds[numLeds-2] = CRGB::Red;
+}
+
 // レインボー（虹色が流れる）
 void patternRainbow(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
     uint8_t hue = (tick / (animSpeed / 200)) % 256;
