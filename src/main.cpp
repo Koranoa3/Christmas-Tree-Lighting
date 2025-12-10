@@ -117,7 +117,7 @@ void loop()
   }
 
   // ボタン2 押下時間を検出し、対応する機能を発動
-  static int centerPercent = 50;
+  static int centerPercent = 67;
   pressDuration = detectButtonPressDuration(1);
   if (pressDuration > 0)
   {
@@ -133,12 +133,44 @@ void loop()
 
   if (butterflyMode)
   {
-    currentPattern(tick, leds, (NUM_LEDS + 1) / 2, animSpeedLevels[currentSpeedIndex]);
+    int largerLeds = NUM_LEDS*centerPercent/100;
+    int smallerLeds = NUM_LEDS - largerLeds;
 
-    // パターンの複製・反転追加
-    for (uint16_t i = 0; i < NUM_LEDS / 2; i++)
+    // 一時バッファを確保
+    static CRGB tempLeds[NUM_LEDS];
+    
+    // largerLeds分をcurrentPatternで生成
+    currentPattern(tick, tempLeds, largerLeds, animSpeedLevels[currentSpeedIndex]);
+    
+    if (centerPercent >= 50)
     {
-      leds[NUM_LEDS - 1 - i] = leds[i];
+      // 中央が多い: 前からlargerLeds分配置し、残りをsmallerLeds分削って反転
+      for (int i = 0; i < largerLeds; i++)
+      {
+      leds[i] = tempLeds[i];
+      }
+      
+      // smallerLeds分を適切な割合で抽出して反転配置
+      for (int i = 0; i < smallerLeds; i++)
+      {
+      int srcIndex = i * largerLeds / smallerLeds;
+      leds[NUM_LEDS - 1 - i] = tempLeds[srcIndex];
+      }
+    }
+    else
+    {
+      // 中央が少ない: largerLeds分を後ろから反転配置し、残りを前から配置
+      for (int i = 0; i < largerLeds; i++)
+      {
+      leds[NUM_LEDS - 1 - i] = tempLeds[i];
+      }
+      
+      // smallerLeds分を前から配置
+      for (int i = 0; i < smallerLeds; i++)
+      {
+      int srcIndex = i * largerLeds / smallerLeds;
+      leds[i] = tempLeds[srcIndex];
+      }
     }
   }
   else
