@@ -79,6 +79,32 @@ void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed
 
 }
 
+void patternIce(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+
+    auto fireColor = [](float t) -> CRGB {
+        if (t <= 0.4f) {
+            float fc = 1.0f - t / 0.4f;
+            return CRGB((uint8_t)(180 * fc), (uint8_t)(255 * fc), 255);
+        } else {
+            float fc = 1.0f - (t - 0.4f) / 0.6f;
+            return CRGB(0, (uint8_t)(255 * fc), 255);
+        }
+    };
+
+    fadeToBlackBy(leds, numLeds, 5);
+
+    for (uint16_t i = 0; i < numLeds; i++) {
+        if (random8() > 20) {
+            continue; // ランダムにスキップして炎の揺らぎを表現
+        }
+        float baseHeat = (float)i / (float)numLeds;
+        float randomOffset = ((float)random8(255) / 255.0f - 0.5f) * 0.4f; // -0.2 to +0.2
+        float heat = constrain(baseHeat + randomOffset, 0.0f, 1.0f);
+        leds[i] = fireColor(heat);
+    }
+
+}
+
 void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
     fadeToBlackBy(leds, numLeds, 80);
 
