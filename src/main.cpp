@@ -9,16 +9,16 @@
 
 CRGB leds[NUM_LEDS];
 uint32_t tick = 0;
+uint32_t centerPercent = 67;
 
 // Patterns
 PatternFunc patterns[] = {
-    patternEndDebug,
+    patternRGStripe,
     patternRainbow,
     patternTwinkle,
     patternWipe,
     patternFire,
     patternIce,
-    patternRGStripe,
 };
 int currentPatternIndex;
 PatternFunc currentPattern;
@@ -81,6 +81,26 @@ unsigned long detectButtonPressDuration(uint8_t btnIndex)
   return pressDuration;
 }
 
+// ボタンが押された瞬間を検出する関数
+// btnIndex: 0=BTN1_PIN, 1=BTN2_PIN
+bool detectButtonJustPressed(uint8_t btnIndex)
+{
+  static bool lastBtnState[2] = {HIGH, HIGH};
+
+  uint8_t pin = (btnIndex == 0) ? BTN1_PIN : BTN2_PIN;
+  bool btnState = digitalRead(pin);
+  bool justPressed = false;
+
+  if (lastBtnState[btnIndex] == HIGH && btnState == LOW)
+  {
+    // ボタンが押された瞬間
+    justPressed = true;
+  }
+  lastBtnState[btnIndex] = btnState;
+
+  return justPressed;
+}
+
 // Setup function
 
 void setup()
@@ -116,18 +136,11 @@ void loop()
       cyclePattern();
   }
 
-  // ボタン2 押下時間を検出し、対応する機能を発動
-  static int centerPercent = 67;
-  pressDuration = detectButtonPressDuration(1);
-  if (pressDuration > 0)
-  {
-    if (pressDuration >= 500)
-      centerPercent -= 10;
-    else
-      centerPercent += 1;
-    
-    Serial.printf("Center percent adjusted to: %d%%\n", centerPercent);
-  }
+  static float impact = 0.0f;
+  // ボタン2 押下を検出し、impactを増加させる
+  if (detectButtonJustPressed(1))
+    impact += 0.8f;
+  impact *= 0.9f; // 徐々に減衰
 
   // 現在のパターンを実行
 
@@ -140,7 +153,7 @@ void loop()
     static CRGB tempLeds[NUM_LEDS];
     
     // largerLeds分をcurrentPatternで生成
-    currentPattern(tick, tempLeds, largerLeds, animSpeedLevels[currentSpeedIndex]);
+    currentPattern(tick, tempLeds, largerLeds, animSpeedLevels[currentSpeedIndex], impact);
     
     if (centerPercent >= 50)
     {
@@ -174,7 +187,7 @@ void loop()
     }
   }
   else
-    currentPattern(tick, leds, NUM_LEDS, animSpeedLevels[currentSpeedIndex]);
+    currentPattern(tick, leds, NUM_LEDS, animSpeedLevels[currentSpeedIndex], impact);
 
   FastLED.show();
   delay(16); // 約60fps

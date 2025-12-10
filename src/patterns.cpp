@@ -2,32 +2,32 @@
 #include "functions.cpp"
 
 // 全LED白点灯（静的）
-void patternSolidWhite(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternSolidWhite(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fill_solid(leds, numLeds, CRGB::White);
 }
 
 // デバッグ用：最後のLEDを白、最後から2番目を灰色に点灯
-void patternEndDebug(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternEndDebug(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fill_solid(leds, numLeds, CRGB::Black);
     leds[numLeds-1] = CRGB::White;
     leds[numLeds-2] = CRGB::Red;
 }
 
 // レインボー（虹色が流れる）
-void patternRainbow(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternRainbow(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     uint8_t hue = (tick / (animSpeed / 200)) % 256;
     fill_rainbow(leds, numLeds, hue, 7);
 }
 
 // チェイス（追いかけるパターン）
-void patternChase(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternChase(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fill_solid(leds, numLeds, CRGB::Black);
     uint16_t pos = (tick / 100) % numLeds;
     leds[pos] = CRGB::White;
 }
 
 // ブリージング（呼吸のように明滅）
-void patternBreathing(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternBreathing(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     uint8_t brightness = beatsin8(30, 0, 255, 0, tick / 4);
     fill_solid(leds, numLeds, CRGB::White);
     for (uint16_t i = 0; i < numLeds; i++) {
@@ -36,14 +36,14 @@ void patternBreathing(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t anim
 }
 
 // きらめき（ランダムに点滅）
-void patternTwinkle(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternTwinkle(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fadeToBlackBy(leds, numLeds, 20);
     if (random8() < 255) {
         leds[random16(numLeds)] = CRGB::White;
     }
 }
 
-void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fadeToBlackBy(leds, numLeds, 120);
     
     float t = (tick%animSpeed) / (float)animSpeed; // tickを秒単位に変換
@@ -60,7 +60,7 @@ void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed
     Serial.printf("%d",startLed);
 }
 
-void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
 
     auto fireColor = [](float t) -> CRGB {
         if (t <= 0.4f) {
@@ -86,7 +86,7 @@ void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed
 
 }
 
-void patternIce(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternIce(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
 
     auto fireColor = [](float t) -> CRGB {
         if (t <= 0.4f) {
@@ -112,7 +112,7 @@ void patternIce(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed)
 
 }
 
-void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fadeToBlackBy(leds, numLeds, 80);
 
     // 赤と緑が交互に流れる
