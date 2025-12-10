@@ -116,65 +116,149 @@ void patternWipe(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed
 
 void patternFire(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed, float impact)
 {
+    static uint32_t fire_offset[16];
+    static uint8_t fire_offset_index = 0;
 
-    auto fireColor = [](float t) -> CRGB
+    if (impact == 1.0f)
     {
-        if (t <= 0.4f)
-        {
-            float factor = t / 0.4f;
-            return CRGB(255, (uint8_t)(180 * (1.0f - factor)), 0);
-        }
-        else
-        {
-            float factor = (t - 0.4f) / 0.6f;
-            return CRGB((uint8_t)(255 * (1.0f - factor)), (uint8_t)(20 * (1.0f - factor)), 0);
-        }
-    };
+        fire_offset[fire_offset_index % 16] = tick;
+        fire_offset_index++;
+    }
 
-    fadeToBlackBy(leds, numLeds, 5);
-
-    for (uint16_t i = 0; i < numLeds; i++)
+    if (impact == 0.0f)
     {
-        if (random8() > 20)
+        auto fireColor = [](float t) -> CRGB
         {
-            continue; // ランダムにスキップして炎の揺らぎを表現
+            if (t <= 0.4f)
+            {
+                float factor = t / 0.4f;
+                return CRGB(255, (uint8_t)(180 * (1.0f - factor)), 0);
+            }
+            else
+            {
+                float factor = (t - 0.4f) / 0.6f;
+                return CRGB((uint8_t)(255 * (1.0f - factor)), (uint8_t)(20 * (1.0f - factor)), 0);
+            }
+        };
+
+        fadeToBlackBy(leds, numLeds, 5);
+
+        for (uint16_t i = 0; i < numLeds; i++)
+        {
+            if (random8() > 20)
+            {
+                continue; // ランダムにスキップして炎の揺らぎを表現
+            }
+            float baseHeat = (float)i / (float)numLeds;
+            float randomOffset = ((float)random8(255) / 255.0f - 0.5f) * 0.4f; // -0.2 to +0.2
+            float heat = constrain(baseHeat + randomOffset, 0.0f, 1.0f);
+            leds[i] = fireColor(heat);
         }
-        float baseHeat = (float)i / (float)numLeds;
-        float randomOffset = ((float)random8(255) / 255.0f - 0.5f) * 0.4f; // -0.2 to +0.2
-        float heat = constrain(baseHeat + randomOffset, 0.0f, 1.0f);
-        leds[i] = fireColor(heat);
+    }
+    else
+    {
+        fadeToBlackBy(leds, numLeds, 160);
+
+        // impact発動時のwipeエフェクト（赤色）
+        for (uint8_t j = 0; j < 16; j++)
+        {
+            uint32_t offset = fire_offset[j];
+            if (offset == 0)
+                continue;
+
+            uint32_t elapsed = (tick - offset) * 10;
+            if (elapsed > animSpeed)
+            {
+                fire_offset[j] = 0;
+                continue;
+            }
+
+            float t_add = elapsed / (float)animSpeed;
+            float prev_add = linearstep(0.3f, 0.7f, t_add);
+            float curr_add = linearstep(0.3f, 0.7f, t_add + 0.2f);
+
+            uint16_t startLed_add = (uint16_t)(prev_add * numLeds);
+            uint16_t endLed_add = (uint16_t)(curr_add * numLeds);
+
+            for (uint16_t i = startLed_add; i < endLed_add && i < numLeds; i++)
+            {
+                leds[i] = CRGB::Red;
+            }
+        }
     }
 }
 
 void patternIce(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed, float impact)
 {
+    static uint32_t ice_offset[16];
+    static uint8_t ice_offset_index = 0;
 
-    auto fireColor = [](float t) -> CRGB
+    if (impact == 1.0f)
     {
-        if (t <= 0.4f)
-        {
-            float fc = 1.0f - t / 0.4f;
-            return CRGB((uint8_t)(180 * fc), (uint8_t)(255 * fc), 255);
-        }
-        else
-        {
-            float fc = 1.0f - (t - 0.4f) / 0.6f;
-            return CRGB(0, (uint8_t)(255 * fc), 255);
-        }
-    };
+        ice_offset[ice_offset_index % 16] = tick;
+        ice_offset_index++;
+    }
 
-    fadeToBlackBy(leds, numLeds, 5);
-
-    for (uint16_t i = 0; i < numLeds; i++)
+    if (impact == 0.0f)
     {
-        if (random8() > 20)
+        auto fireColor = [](float t) -> CRGB
         {
-            continue; // ランダムにスキップして炎の揺らぎを表現
+            if (t <= 0.4f)
+            {
+                float fc = 1.0f - t / 0.4f;
+                return CRGB((uint8_t)(180 * fc), (uint8_t)(255 * fc), 255);
+            }
+            else
+            {
+                float fc = 1.0f - (t - 0.4f) / 0.6f;
+                return CRGB(0, (uint8_t)(255 * fc), 255);
+            }
+        };
+
+        fadeToBlackBy(leds, numLeds, 5);
+
+        for (uint16_t i = 0; i < numLeds; i++)
+        {
+            if (random8() > 20)
+            {
+                continue; // ランダムにスキップして炎の揺らぎを表現
+            }
+            float baseHeat = (float)i / (float)numLeds;
+            float randomOffset = ((float)random8(255) / 255.0f - 0.5f) * 0.4f; // -0.2 to +0.2
+            float heat = constrain(baseHeat + randomOffset, 0.0f, 1.0f);
+            leds[i] = fireColor(heat);
         }
-        float baseHeat = (float)i / (float)numLeds;
-        float randomOffset = ((float)random8(255) / 255.0f - 0.5f) * 0.4f; // -0.2 to +0.2
-        float heat = constrain(baseHeat + randomOffset, 0.0f, 1.0f);
-        leds[i] = fireColor(heat);
+    }
+    else
+    {
+        fadeToBlackBy(leds, numLeds, 160);
+
+        // impact発動時のwipeエフェクト（青色）
+        for (uint8_t j = 0; j < 16; j++)
+        {
+            uint32_t offset = ice_offset[j];
+            if (offset == 0)
+                continue;
+
+            uint32_t elapsed = (tick - offset) * 10;
+            if (elapsed > animSpeed)
+            {
+                ice_offset[j] = 0;
+                continue;
+            }
+
+            float t_add = elapsed / (float)animSpeed;
+            float prev_add = linearstep(0.3f, 0.7f, t_add);
+            float curr_add = linearstep(0.3f, 0.7f, t_add + 0.2f);
+
+            uint16_t startLed_add = (uint16_t)(prev_add * numLeds);
+            uint16_t endLed_add = (uint16_t)(curr_add * numLeds);
+
+            for (uint16_t i = startLed_add; i < endLed_add && i < numLeds; i++)
+            {
+                leds[i] = CRGB::Blue;
+            }
+        }
     }
 }
 
