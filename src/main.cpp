@@ -139,11 +139,11 @@ void loop()
 
   static float impact = 0.0f;
   // ボタン2 押下を検出し、impactを増加させる
-  if (detectButtonJustPressed(1))
-    impact += 0.8f;
-  impact *= 0.95f; // 徐々に減衰
+  impact *= 0.9f; // 徐々に減衰
   if (impact < 0.01f)
     impact = 0.0f;
+  if (detectButtonJustPressed(1))
+    impact += 0.8f;
 
   // 現在のパターンを実行
 

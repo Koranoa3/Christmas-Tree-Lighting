@@ -15,7 +15,7 @@ void patternEndDebug(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animS
 
 // レインボー（虹色が流れる）
 void patternRainbow(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
-    uint8_t hue = (tick / (animSpeed / 200)) % 256;
+    uint8_t hue = ((tick-uint16_t(impact*10000)) / (animSpeed / 200)) % 256;
     fill_rainbow(leds, numLeds, hue, 7);
 }
 
@@ -41,6 +41,8 @@ void patternTwinkle(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSp
     if (random8() < 255) {
         leds[random16(numLeds)] = CRGB::White;
     }
+    if (impact > 0.9f)
+        fill_solid(leds, numLeds, CRGB::White);
 }
 
 void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
@@ -119,7 +121,7 @@ void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animS
     int stripeWidth = 40; // ストライプの幅
 
     for (uint16_t i = 0; i < numLeds; i++) {
-        int pos = (i + (tick / (animSpeed / 50))) % (stripeWidth * 2);
+        int pos = (i + ((tick-uint16_t(impact*10000)) / (animSpeed / 50))) % (stripeWidth * 2);
         int posInStripe = pos % stripeWidth;
         float t = (float)posInStripe / (float)stripeWidth;
         float brightness = smoothstep(0.0f, 1.0f, 1.0f - t); // 先頭1.0f → 終端0.0f
