@@ -83,15 +83,20 @@ void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animS
     fadeToBlackBy(leds, numLeds, 80);
 
     // 赤と緑が交互に流れる
-    float t = (tick % (animSpeed*2)) / (float)(animSpeed);
-    CRGB color = (t<1.0f) ? CRGB::Red : CRGB::Green;
-    float prev = smoothstep(0.3f, 0.7f, fmod(t, 1.0f) - 0.2f);
-    float curr = smoothstep(0.3f, 0.7f, fmod(t, 1.0f));
-    
-    uint16_t startLed = (uint16_t)(prev * numLeds);
-    uint16_t endLed = (uint16_t)(curr * numLeds);
-    
-    for (uint16_t i = startLed; i < endLed && i < numLeds; i++) {
-        leds[i] = color;
+    int stripeWidth = 40; // ストライプの幅
+
+    for (uint16_t i = 0; i < numLeds; i++) {
+        int pos = (i + (tick / (animSpeed / 50))) % (stripeWidth * 2);
+        int posInStripe = pos % stripeWidth;
+        float t = (float)posInStripe / (float)stripeWidth;
+        float brightness = smoothstep(0.0f, 1.0f, 1.0f - t); // 先頭1.0f → 終端0.0f
+        
+        CRGB color;
+        if (pos < stripeWidth){
+            leds[i] = CRGB::Red;
+        } else {
+            leds[i] = CRGB::Green;
+        }
+        leds[i].nscale8((uint8_t)(brightness * 255));
     }
 }
