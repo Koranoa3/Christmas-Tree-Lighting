@@ -3,7 +3,8 @@
 #include "config.h"
 #include "patterns.h"
 
-#define BTN_PIN 18
+#define BTN1_PIN 18
+#define BTN2_PIN 22
 #define LED_PIN 19
 
 CRGB leds[NUM_LEDS];
@@ -52,13 +53,41 @@ void cycleSpeed()
   Serial.printf("Animation speed changed to: %d ms\n", animSpeedLevels[currentSpeedIndex]);
 }
 
+// ボタン押下時間を検出する関数
+// ボタンが離された瞬間に押下時間(ms)を返す、それ以外は0を返す
+// btnIndex: 0=BTN1_PIN, 1=BTN2_PIN
+unsigned long detectButtonPressDuration(uint8_t btnIndex)
+{
+  static bool lastBtnState[2] = {HIGH, HIGH};
+  static unsigned long btnPressTime[2] = {0, 0};
+
+  uint8_t pin = (btnIndex == 0) ? BTN1_PIN : BTN2_PIN;
+  bool btnState = digitalRead(pin);
+  unsigned long pressDuration = 0;
+
+  if (lastBtnState[btnIndex] == HIGH && btnState == LOW)
+  {
+    // ボタンが押された瞬間
+    btnPressTime[btnIndex] = millis();
+  }
+  else if (lastBtnState[btnIndex] == LOW && btnState == HIGH)
+  {
+    // ボタンが離された瞬間
+    pressDuration = millis() - btnPressTime[btnIndex];
+  }
+  lastBtnState[btnIndex] = btnState;
+
+  return pressDuration;
+}
+
 // Setup function
 
 void setup()
 {
   Serial.begin(115200);
 
-  pinMode(BTN_PIN, INPUT_PULLUP);
+  pinMode(BTN1_PIN, INPUT_PULLUP);
+  pinMode(BTN2_PIN, INPUT_PULLUP);
   butterflyMode = false;
   currentPatternIndex = DEFAULT_PATTERN_INDEX;
   currentPattern = patterns[currentPatternIndex];
@@ -74,34 +103,17 @@ void loop()
 {
   tick = millis();
 
-  // ボタンが押されたらパターンを切り替え、長押しで速度変更
-  static bool lastBtnState = HIGH;
-  static unsigned long btnPressTime = 0;
-  bool btnState = digitalRead(BTN_PIN);
-
-  if (lastBtnState == HIGH && btnState == LOW)
+  // ボタン1 押下時間を検出し、対応する機能を発動
+  unsigned long pressDuration = detectButtonPressDuration(0);
+  if (pressDuration > 0)
   {
-    // ボタンが押された瞬間
-    btnPressTime = millis();
-  }
-  else if (lastBtnState == LOW && btnState == HIGH)
-  {
-    // ボタンが離された瞬間
-    unsigned long pressDuration = millis() - btnPressTime;
     if (pressDuration >= 1500)
-    {
       toggleButterflyMode();
-    }
     else if (pressDuration >= 500)
-    {
       cycleSpeed();
-    }
     else
-    {
       cyclePattern();
-    }
   }
-  lastBtnState = btnState;
 
   // 現在のパターンを実行
 
