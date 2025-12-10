@@ -78,3 +78,20 @@ void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed
     }
 
 }
+
+void patternRGStripe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed) {
+    fadeToBlackBy(leds, numLeds, 80);
+
+    // 赤と緑が交互に流れる
+    float t = (tick % (animSpeed*2)) / (float)(animSpeed);
+    CRGB color = (t<1.0f) ? CRGB::Red : CRGB::Green;
+    float prev = smoothstep(0.3f, 0.7f, fmod(t, 1.0f) - 0.2f);
+    float curr = smoothstep(0.3f, 0.7f, fmod(t, 1.0f));
+    
+    uint16_t startLed = (uint16_t)(prev * numLeds);
+    uint16_t endLed = (uint16_t)(curr * numLeds);
+    
+    for (uint16_t i = startLed; i < endLed && i < numLeds; i++) {
+        leds[i] = color;
+    }
+}
