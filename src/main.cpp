@@ -15,6 +15,8 @@ PatternFunc patterns[] = {
     patternTwinkle,
     patternWipe,
     patternFire,
+    patternIce,
+    patternRGStripe,
 };
 int currentPatternIndex;
 PatternFunc currentPattern;
@@ -41,7 +43,7 @@ void cyclePattern()
 }
 
 // Animation speed
-uint16_t animSpeedLevels[] = {500, 1000, 2000};
+uint16_t animSpeedLevels[] = {2000, 4000};
 int currentSpeedIndex;
 
 void cycleSpeed()
