@@ -124,20 +124,21 @@ void setup()
 void loop()
 {
   tick = millis();
+  static float impact = 0.0f;
 
   // ボタン1 押下時間を検出し、対応する機能を発動
   unsigned long pressDuration = detectButtonPressDuration(0);
   if (pressDuration > 0)
   {
-    if (pressDuration >= 1500)
-      toggleButterflyMode();
-    else if (pressDuration >= 500)
-      cycleSpeed();
-    else
+    // if (pressDuration >= 1500)
+    //   toggleButterflyMode();
+    // else if (pressDuration >= 500)
+    //   cycleSpeed();
+    // else
       cyclePattern();
+      impact = 0.0f;
   }
 
-  static float impact = 0.0f;
   // ボタン2 押下を検出し、impactを増加させる
   impact *= 0.9f; // 徐々に減衰
   if (impact < 0.01f)

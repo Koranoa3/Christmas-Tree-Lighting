@@ -182,7 +182,7 @@ void patternFire(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed
 
             for (uint16_t i = startLed_add; i < endLed_add && i < numLeds; i++)
             {
-                leds[i] = CRGB::Red;
+                leds[i] = CRGB(252, 82, 3);
             }
         }
     }
@@ -256,7 +256,7 @@ void patternIce(uint32_t tick, CRGB *leds, uint16_t numLeds, uint16_t animSpeed,
 
             for (uint16_t i = startLed_add; i < endLed_add && i < numLeds; i++)
             {
-                leds[i] = CRGB::Blue;
+                leds[i] = CRGB(3, 186, 252);
             }
         }
     }
