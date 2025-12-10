@@ -9,7 +9,7 @@
 
 CRGB leds[NUM_LEDS];
 uint32_t tick = 0;
-uint32_t centerPercent = 67;
+uint32_t centerPercent = 50;
 
 // Patterns
 PatternFunc patterns[] = {
@@ -109,10 +109,11 @@ void setup()
 
   pinMode(BTN1_PIN, INPUT_PULLUP);
   pinMode(BTN2_PIN, INPUT_PULLUP);
-  butterflyMode = false;
+  butterflyMode = DEFAULT_BUTTERFLY_MODE;
   currentPatternIndex = DEFAULT_PATTERN_INDEX;
   currentPattern = patterns[currentPatternIndex];
   currentSpeedIndex = DEFAULT_ANIM_SPEED_INDEX; // Default to medium speed
+  centerPercent = DEFAULT_CENTER_PERCENT;
 
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(BRIGHTNESS);
