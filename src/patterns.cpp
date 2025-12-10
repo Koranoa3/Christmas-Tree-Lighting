@@ -48,19 +48,61 @@ void patternTwinkle(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSp
 
 void patternWipe(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
     fadeToBlackBy(leds, numLeds, 120);
-    
-    float t = (tick%animSpeed) / (float)animSpeed; // tickを秒単位に変換
-    float prev = linearstep(0.3f, 0.7f, t - 0.2f);
-    float curr = linearstep(0.3f, 0.7f, t);
-    
-    uint16_t startLed = (uint16_t)(prev * numLeds);
-    uint16_t endLed = (uint16_t)(curr * numLeds);
-    
-    for (uint16_t i = startLed; i < endLed && i < numLeds; i++) {
-        leds[i] = CRGB::White;
+
+    static uint32_t additional_offset[16]; // impact>0.0fの場合。(tick-offset)を秒単位に変換し、1000ms以内のものはそれぞれ再生
+    static uint8_t offset_index = 0;
+    if (impact == 1.0f)
+    {
+        additional_offset[offset_index % 16] = tick;
+        offset_index++;
     }
 
-    Serial.printf("%d",startLed);
+    if (impact == 0.0f)
+    {
+        // 通常のwipe再生（impact==0.0fの場合のループアニメーション）
+        float t = (tick % animSpeed) / (float)animSpeed;
+        float prev = linearstep(0.3f, 0.7f, t - 0.2f);
+        float curr = linearstep(0.3f, 0.7f, t);
+
+        uint16_t startLed = (uint16_t)(prev * numLeds);
+        uint16_t endLed = (uint16_t)(curr * numLeds);
+
+        for (uint16_t i = startLed; i < endLed && i < numLeds; i++)
+        {
+            leds[i] = CRGB::White;
+        }
+    }
+    else
+    {
+        fadeToBlackBy(leds, numLeds, 80);
+
+        // impact発動時の追加wipe再生（1000ms以内のオフセットをそれぞれ再生）
+        for (uint8_t j = 0; j < 16; j++)
+        {
+            uint32_t offset = additional_offset[j];
+            if (offset == 0)
+                continue;
+
+            uint32_t elapsed = (tick - offset) * 10;
+            if (elapsed > animSpeed)
+            {
+                additional_offset[j] = 0; // 期限切れのオフセットをクリア
+                continue;
+            }
+
+            float t_add = elapsed / (float)animSpeed;
+            float prev_add = linearstep(0.3f, 0.7f, t_add);
+            float curr_add = linearstep(0.3f, 0.7f, t_add + 0.2f);
+
+            uint16_t startLed_add = (uint16_t)(prev_add * numLeds);
+            uint16_t endLed_add = (uint16_t)(curr_add * numLeds);
+
+            for (uint16_t i = startLed_add; i < endLed_add && i < numLeds; i++)
+            {
+                leds[i] = CRGB::White;
+            }
+        }
+    }
 }
 
 void patternFire(uint32_t tick, CRGB* leds, uint16_t numLeds, uint16_t animSpeed, float impact) {
