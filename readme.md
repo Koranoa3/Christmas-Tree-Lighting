@@ -4,7 +4,11 @@
 パターンは一旦固定。時間があれば、Wifi・外部接続から制御するかも
 
 - C++
-- ESP32
-- PlatformIO
 - FastLED
+- ESP32
+- PlatformIO：ライブラリ管理とビルド環境
+- Wokwi：シミュレーション
 
+config.hでLEDの数や明るさ、デフォルトのモードなどを設定
+main.cppでLEDの初期化とメインループを実装
+patterns.cppでパターン定義
